@@ -108,42 +108,54 @@ def restricted_count(rankings, weights, remaining):
 
     return counts
 
-def net_compare_a_over_b(rankings, weights, alt_a, alt_b):
-    net_a_over_b = 0
-    for row in range(len(rankings)):
-        alt_count = len(rankings[row])
-        a_rank = alt_count + 1
-        b_rank = alt_count + 1
-        for i in range(alt_count):
-            if rankings[row][i] == alt_a:
-                a_rank = i
-            elif rankings[row][i] == alt_b:
-                b_rank = i
-        if a_rank < b_rank:
-            net_a_over_b += weights[row][0]
-        elif b_rank < a_rank:
-            net_a_over_b -= weights[row][0]
-    return net_a_over_b
-
 def compare_a_over_b(rankings, weights, alt_a, alt_b):
-    if alt_a == alt_b:
-        return 0
     a_over_b = 0
-    for row in range(len(rankings)):
-        alt_count = len(rankings[row])
-        a_rank = alt_count + 1
-        b_rank = alt_count + 1
-        for i in range(alt_count):
-            if rankings[row][i] == alt_a:
+    for row, ranking in enumerate(rankings):
+        a_rank = b_rank = len(ranking) + 1
+        for i, alt in enumerate(ranking):
+            if alt == alt_a:
                 a_rank = i
-            elif rankings[row][i] == alt_b:
+            elif alt == alt_b:
                 b_rank = i
+            if a_rank <= len(ranking) and b_rank <= len(ranking):
+                break
         if a_rank < b_rank:
             a_over_b += weights[row][0]
     return a_over_b
 
+def net_compare_a_over_b(rankings, weights, alt_a, alt_b):
+    return compare_a_over_b(rankings, weights, alt_a, alt_b) - compare_a_over_b(rankings, weights, alt_b, alt_a)
 
-#testing functions
+def dfs(matrix, node, visited, finish_stack):
+    visited[node] = True
+    for neighbor in range(len(matrix)):
+        if matrix[node][neighbor] > 0 and not visited[neighbor]: 
+            dfs(matrix, neighbor, visited, finish_stack)
+    finish_stack.append(node)
+
+def kosaraju_scc(net_counts):
+    n = len(net_counts)
+    finish_stack = []
+    visited = [False] * n
+    for node in range(n):
+        if not visited[node]:
+            dfs(net_counts, node, visited, finish_stack)
+    transposed_matrix = np.transpose(net_counts)    
+    visited = [False] * n
+    sccs = []    
+    while finish_stack:
+        node = finish_stack.pop()
+        if not visited[node]:
+            scc = []
+            dfs(transposed_matrix, node, visited, scc)
+            sccs.append(scc)    
+    return sccs
+
+
+
+
+'''
+#testing zone
 a = ((1,2,3,4,5),8)
 b = ((2,1,3,4,5),8)
 c = ((3,1,4,5,2),9)
@@ -160,4 +172,6 @@ ranks, weights = orders_to_matrix(arr,5)
 #print(get_column_counts(ranks,weights,1))
 print(compare_a_over_b(ranks,weights,2,1))
 
+
+'''
 
