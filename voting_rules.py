@@ -66,23 +66,13 @@ def find_smith_set(instance):
     n = instance.num_alternatives
     rankings, weights = orders_to_matrix(instance.flatten_strict(), n)
     net_counts = np.zeros((n, n), dtype=int)
-    
     for a in range(1, n + 1):
         for b in range(a + 1, n + 1):
             x = net_compare_a_over_b(rankings, weights, a, b)
             net_counts[a - 1][b - 1] = x
             net_counts[b - 1][a - 1] = -x
     sccs = kosaraju_scc(net_counts)
-    for scc in sccs:
-        is_dominated = False
-        for other_scc in sccs:
-            if other_scc != scc:
-                if any(net_counts[a][b] <= 0 for a in scc for b in other_scc):
-                    is_dominated = True
-                    break
-        if not is_dominated:
-            return scc    
-    return []
+    return check_smith_set(net_counts, sccs)
 
 def net_condorcet(instance, tiebreak=True):
     if not instance.has_condorcet and not tiebreak:
@@ -90,39 +80,31 @@ def net_condorcet(instance, tiebreak=True):
     n = instance.num_alternatives
     rankings, weights = orders_to_matrix(instance.flatten_strict(), instance.num_alternatives)
     net_counts = np.zeros((n,n))
-    winners = []
     for a in range(1, n + 1):
         for b in range(a + 1, n + 1):
             x = net_compare_a_over_b(rankings, weights, a, b)
             net_counts[a - 1][b - 1] = x
             net_counts[a - 1][b - 1] = -x
+        #case when outright winner is found
         if all(net_counts[a - 1][i] > 0 for i in range(n) if i != a - 1):
             return [a]
-    return net_counts
 
+    #case when no outright winner found
+    #get smith set of finalists
+    finalists = kosaraju_scc(net_counts)
+    finalists = check_smith_set(net_counts, finalists)
 
-def condorcet(instance, tiebreak=True):
-    if not instance.has_condorcet and not tiebreak:
-        return []
-    n = instance.num_alternatives
-    rankings, weights = orders_to_matrix(instance.flatten_strict(), instance.num_alternatives)
-    pairwise_counts = np.zeros((n,n))
-    winners = []
-    #creating pairwise matrix, dealing with scenario where there is an outright winner
-    for a in range(1, n + 1):
-        cond_winner = True
-        not_all_zero = False
-        for b in range(1, n + 1):
-            x = compare_a_over_b(rankings, weights, a, b)
-            if not_all_zero == False and x:
-                not_all_zero = True
-            if cond_winner and x < 0:
-                cond_winner = False
-            pairwise_counts[a - 1][b - 1] = x
-        if cond_winner and not_all_zero:
-            return [a]
-    return pairwise_counts
-    
+    #tiebreak: margin of worst loss
+    best_seen = math.inf
+    best_alt = []
+    for alt in finalists:
+        worst = min(net_counts[alt - 1])
+        if worst > best_seen:
+            best_seen = worst
+            best_alt = [alt]
+        elif worst == best_seen:
+            best_alt.append(alt)
+    return best_alt
 
 
 
@@ -131,6 +113,34 @@ def condorcet(instance, tiebreak=True):
 
 
 #testing zone
+
+
+
+def test_cond(arr):
+    finalists = kosaraju_scc(arr)
+    finalists = check_smith_set(arr, finalists)
+    best_seen = -math.inf
+    best_alt = []
+    for alt in finalists:
+        worst = min(net_counts[alt - 1])
+        if worst > best_seen:
+            best_seen = worst
+            best_alt = [alt]
+        elif worst == best_seen:
+            best_alt.append(alt)
+    return best_alt
+
+prefs = np.array([
+    [0, -6, 5, -12, -24, 0],
+    [6, 0, 2, -3, -12, -3],
+    [-5, -2, 0, -4, -2, -4],
+    [12, 3, 4, 0, 16, -27],
+    [24, 12, 2, -16, 0, 13],
+    [0, 3, 4, 27, -13, 0]
+    ])
+
+print(test_cond(prefs))
+
 
 def test_IRV(rankings, weights, remaining):    
     while len(remaining) > 1:
@@ -232,10 +242,10 @@ r,w = orders_to_matrix(arr,5)
 #rem = [1,2,3,4,5]
 #print(test_IRV(r,w,rem)) #should give 4
 
-print(test_cond_matrix(r, w, 5))
-print(test_net_cond_matrix(r, w, 5))
+#print(test_cond_matrix(r, w, 5))
+#print(test_net_cond_matrix(r, w, 5))
 
-print(test_copeland(r, w, 5))
+#print(test_copeland(r, w, 5))
 
 
 

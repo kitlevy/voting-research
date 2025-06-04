@@ -151,10 +151,23 @@ def kosaraju_scc(net_counts):
             sccs.append(scc)    
     return sccs
 
+def check_smith_set(net_counts, sccs):
+    for scc in sccs:
+        is_dominated = False
+        for other_scc in sccs:
+            if other_scc != scc:
+                if any(net_counts[a][b] <= 0 for a in scc for b in other_scc):
+                    is_dominated = True
+                    break
+        if not is_dominated:
+            return scc    
+    return []
+
 
 
 
 '''
+
 #testing zone
 a = ((1,2,3,4,5),8)
 b = ((2,1,3,4,5),8)
