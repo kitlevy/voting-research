@@ -37,7 +37,7 @@ def IRV(instance):
 
     return remaining
 
-def copeland(instance, tie_weight=0.5):
+def copeland(instance, tie_weight=0.5, win_weight=1):
     n = instance.num_alternatives
     rankings, weights = orders_to_matrix(instance.flatten_strict(), instance.num_alternatives)
     points = n * [0]
@@ -72,10 +72,11 @@ def find_smith_set(instance):
             net_counts[a - 1][b - 1] = x
             net_counts[b - 1][a - 1] = -x
     sccs = kosaraju_scc(net_counts)
+
     return check_smith_set(net_counts, sccs)
 
-def net_condorcet(instance, tiebreak=True):
-    if not instance.has_condorcet and not tiebreak:
+def condorcet(instance, tiebreak=True):
+    if not has_condorcet(instance) and not tiebreak:
         return []
     n = instance.num_alternatives
     rankings, weights = orders_to_matrix(instance.flatten_strict(), instance.num_alternatives)
@@ -109,7 +110,7 @@ def net_condorcet(instance, tiebreak=True):
 
 
 
-
+'''
 
 
 #testing zone
@@ -118,11 +119,15 @@ def net_condorcet(instance, tiebreak=True):
 
 def test_cond(arr):
     finalists = kosaraju_scc(arr)
+    print("current finalists list")
+    print(finalists)
     finalists = check_smith_set(arr, finalists)
+    print("current finalists list")
+    print(finalists)
     best_seen = -math.inf
     best_alt = []
     for alt in finalists:
-        worst = min(net_counts[alt - 1])
+        worst = min(arr[alt - 1])
         if worst > best_seen:
             best_seen = worst
             best_alt = [alt]
@@ -166,25 +171,6 @@ def test_net_cond_matrix(rankings, weights, n):
         #if cond_winner:
             #return [a]
     return net_counts
-
-def test_cond_matrix(rankings, weights, n):
-    pairwise_counts = np.zeros((n,n))
-    winners = []
-    #creating pairwise matrix, dealing with scenario where there is an outright winner
-    for a in range(1, n + 1):
-        cond_winner = True
-        not_all_zero = False
-        for b in range(1, n + 1):
-            x = compare_a_over_b(rankings, weights, a, b)
-            if not_all_zero == False and x:
-                not_all_zero = True
-            if cond_winner and x < 0:
-                cond_winner = False
-            pairwise_counts[a - 1][b - 1] = x
-        if cond_winner and not_all_zero:
-            #return [a]
-            continue
-    return pairwise_counts
 
 def test_copeland(rankings, weights, n, win_weight=1, tie_weight=0.5):
     points = n * [0]
@@ -248,5 +234,5 @@ r,w = orders_to_matrix(arr,5)
 #print(test_copeland(r, w, 5))
 
 
-
+'''
 
