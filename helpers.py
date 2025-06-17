@@ -17,6 +17,12 @@ def get_rankings(u):
 def apply_anchor(u, w, alpha):
     return (1 - alpha) * u + alpha * w
 
+def simplex_to_cartesian(w):
+    #a, b, c = w
+    cart_x = w[1] * 0.5 + w[2]
+    cart_y = w[1] * np.sqrt(3) / 2
+    return cart_x, cart_y  
+
 def count_profiles(rankings):
     labels = ['a', 'b', 'c']
     return Counter(''.join(labels[i] for i in rank) for rank in rankings)

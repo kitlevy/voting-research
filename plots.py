@@ -2,16 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from helpers import *
 
-def simplex_to_cartesian(w):
-    #a, b, c = w
-    cart_x = w[1] * 0.5 + w[2]
-    cart_y = w[1] * np.sqrt(3) / 2
-
-    return cart_x, cart_y
-
-def apply_anchor(u, w, alpha):
-    return (1 - alpha) * u + alpha * w
-
 def plot_simplex_with_anchor(w_list, w_labels=None, alt_labels=None):
     corners = np.array([
         [0.0, 0.0],           #a
