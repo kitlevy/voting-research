@@ -1,6 +1,6 @@
 import numpy as np
 import math
-from helpers import *
+from preflib_helpers import *
 from preflibtools.properties import has_condorcet
 
 def first_past_the_post(instance):
