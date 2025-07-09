@@ -49,18 +49,11 @@ P = [z_zco, z_zoc, zo_zoc, zc_zco, zco_zco, zoc_zoc,
      o_ozc, o_ocz, oc_ocz, oz_ozc, ozc_ozc, ocz_ocz]
 
 elim_z, elim_c, elim_o = cp.Variable(boolean=True), cp.Variable(boolean=True), cp.Variable(boolean=True)
-win_z, win_c, win_o = cp.Variable(boolean=True), cp.Variable(boolean=True), cp.Variable(boolean=True)
-
-p_elim_z, p_elim_c, p_elim_o = cp.Variable(boolean=True), cp.Variable(boolean=True), cp.Variable(boolean=True)
-#c_wins_partial = cp.Variable(boolean=True)
 
 M = 1.0
 epsilon = 1e-5
 constraints = [sum(P) == 1,
-               #c_wins_partial <= 0,
-               elim_z + elim_c + elim_o == 1,
-               win_z + win_c + win_o == 1,
-               p_elim_z + p_elim_c + p_elim_o == 1]
+               elim_z + elim_c + elim_o == 1]
 
 fc_z = z_zco + z_zoc + zo_zoc + zc_zco + zco_zco + zoc_zoc
 fc_c = c_czo + c_coz + co_coz + cz_czo + czo_czo + coz_coz
@@ -78,91 +71,64 @@ constraints += [
     fc_o - fc_c <= M * (1 - elim_o)
 ]
 
-
-'''
 constraints += enforce_unequal(fc_z, fc_c, epsilon, "fc_zc")
 constraints += enforce_unequal(fc_z, fc_o, epsilon, "fc_zo")
 constraints += enforce_unequal(fc_c, fc_o, epsilon, "fc_co")
-'''
 
-z_expr_c = z_zco + zc_zco + zco_zco
-z_expr_o = z_zoc + zo_zoc + zoc_zoc
-c_expr_z = z_zco + zc_zco + zco_zco
-c_expr_o = o_ocz + oc_ocz + ocz_ocz
-o_expr_z = z_zoc + zo_zoc + zoc_zoc
-o_expr_c = c_coz + co_coz + coz_coz
+forced_z_to_c = z_zco + zc_zco + zco_zco
+forced_z_to_o = z_zoc + zo_zoc + zoc_zoc
+forced_c_to_z = c_czo + cz_czo + czo_czo
+forced_c_to_o = c_coz + co_coz + coz_coz
+forced_o_to_z = o_ozc + oz_ozc + ozc_ozc
+forced_o_to_c = o_ocz + oc_ocz + ocz_ocz
 
-z_elim_c, c1 = bigM_product(elim_c, z_expr_c, M, "z_elim_c")
-z_elim_o, c2 = bigM_product(elim_o, z_expr_o, M, "z_elim_o")
-c_elim_z, c3 = bigM_product(elim_z, c_expr_z, M, "c_elim_z")
-c_elim_o, c4 = bigM_product(elim_o, c_expr_o, M, "c_elim_o")
-o_elim_z, c5 = bigM_product(elim_z, o_expr_z, M, "o_elim_z")
-o_elim_c, c6 = bigM_product(elim_c, o_expr_c, M, "o_elim_c")
-
+z_elim_c, c1 = bigM_product(elim_c, forced_c_to_z, M, "z_elim_c")
+z_elim_o, c2 = bigM_product(elim_o, forced_o_to_z, M, "z_elim_o")
+c_elim_z, c3 = bigM_product(elim_z, forced_z_to_c, M, "c_elim_z")
+c_elim_o, c4 = bigM_product(elim_o, forced_o_to_c, M, "c_elim_o")
+o_elim_z, c5 = bigM_product(elim_z, forced_z_to_o, M, "o_elim_z")
+o_elim_c, c6 = bigM_product(elim_c, forced_o_to_c, M, "o_elim_c")
 constraints += c1 + c2 + c3 + c4 + c5 + c6
 
 z_round2 = fc_z + z_elim_c + z_elim_o
 c_round2 = fc_c + c_elim_z + c_elim_o
 o_round2 = fc_o + o_elim_z + o_elim_c
 
+#enforcing c strictly wins under forced
 constraints += [
-    win_c == 1,
     c_round2 >= z_round2 + epsilon,
     c_round2 >= o_round2 + epsilon
 ]
 
-#partial elimination
-fc_z_p = z_zco + z_zoc + zo_zoc + zc_zco + zco_zco + zoc_zoc
-fc_c_p = c_czo + c_coz + co_coz + cz_czo + czo_czo + coz_coz
-fc_o_p = o_ozc + o_ocz + oc_ocz + oz_ozc + ozc_ozc + ocz_ocz
-
+#enforcing o is first eliminated
 constraints += [
-    #if p_elim_z == 1 then fc_z_p ≤ fc_c_p and fc_z_p ≤ fc_o_p    
-    fc_z_p - fc_c_p <= M * (1 - p_elim_z),
-    fc_z_p - fc_o_p <= M * (1 - p_elim_z),
-    fc_c_p - fc_z_p <= M * (1 - p_elim_c),
-    fc_c_p - fc_o_p <= M * (1 - p_elim_c),
-    fc_o_p - fc_z_p <= M * (1 - p_elim_o),
-    fc_o_p - fc_c_p <= M * (1 - p_elim_o)
+    fc_c >= fc_o + epsilon,
+    fc_z >= fc_o + epsilon
 ]
 
-constraints += [
-    #fc_z_p >= fc_c_p + epsilon,
-    fc_z_p >= fc_o_p + epsilon
-]
+constraints += enforce_unequal(fc_z, fc_c, epsilon, "fc_zc_p")
+constraints += enforce_unequal(fc_z, fc_o, epsilon, "fc_zo_p")
+constraints += enforce_unequal(fc_c, fc_o, epsilon, "fc_co_p")
 
-'''
-constraints += enforce_unequal(fc_z_p, fc_c_p, epsilon, "fc_zc_p")
-constraints += enforce_unequal(fc_z_p, fc_o_p, epsilon, "fc_zo_p")
-constraints += enforce_unequal(fc_c_p, fc_o_p, epsilon, "fc_co_p")
-'''
+partial_z_to_c = zc_zco + zco_zco
+partial_o_to_c = oc_ocz + ocz_ocz
 
-p_expr_z = zc_zco + zco_zco
-p_expr_o = o_ocz + oc_ocz + ocz_ocz
-
-c_partial_z, c7 = bigM_product(p_elim_z, p_expr_z, M, "c_partial_z")
-c_partial_o, c8 = bigM_product(p_elim_o, p_expr_o, M, "c_partial_o")
+c_partial_z, c7 = bigM_product(elim_z, partial_z_to_c, M, "c_partial_z")
+c_partial_o, c8 = bigM_product(elim_o, partial_o_to_c, M, "c_partial_o")
 
 constraints += c7 + c8
 
-c_round2_p = fc_c_p + c_partial_z + c_partial_o
+c_round2_p = fc_c + c_partial_z + c_partial_o
 
-'''
-constraints += [
-    c_round2_p - fc_z_p <= M * c_wins_partial,
-    c_round2_p - fc_o_p <= M * c_wins_partial
-]
-'''
-# enforce z wins with partial prefs
+# enforce z strictly wins with partial prefs
 constraints += [
     z_round2 >= c_round2_p + epsilon,
     z_round2 >= o_round2 + epsilon
 ]
-objective = cp.Maximize(c_round2 - c_round2_p)
+#objective = cp.Maximize(c_round2 - c_round2_p)
+objective = cp.Minimize(0)
 prob = cp.Problem(objective, constraints)
 prob.solve(solver=cp.GUROBI, reoptimize=True)
-#prob = cp.Problem(cp.Minimize(0), constraints)
-#prob.solve()
 
 if prob.status == cp.OPTIMAL:
     print("Found valid distribution.")
@@ -170,13 +136,15 @@ if prob.status == cp.OPTIMAL:
     print("Vote distribution:")
     for var in P:
         if var.value and var.value > 1e-6:
-            print(f"  {retrieve_name(var)}: {var.value:.4f}")
-    print(f"c_round2 (forced): {c_round2.value:.4f}")
-    print(f"c_round2 (partial): {c_round2_p.value:.4f}")
-    print(f"z_round2 (partial): {z_round2.value:.4f}")
+            print(f"  {retrieve_name(var)}: {var.value:.6f}")
+
+    print(f"c_round2 (forced): {c_round2.value:.6f}")
+    print(f"c_round2 (partial): {c_round2_p.value:.6f}")
+    print(f"z_round2 (partial): {z_round2.value:.6f}")
+    exhausted_partial = 1 - (z_round2.value + c_round2_p.value)
+    print(f"Exhausted ballots in partial IRV: {exhausted_partial:.6f}")
+    
 else:
-    print("No solution found.")
-
-
+    print(f"No solution found. Status: {prob.status}")
 
 
