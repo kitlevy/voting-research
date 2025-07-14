@@ -32,6 +32,8 @@ ocz_ocz = cp.Variable(nonneg=True)
 P = [z_zco, z_zoc, zo_zoc, zc_zco, zco_zco, zoc_zoc, c_czo, c_coz, co_coz, cz_czo, czo_czo, coz_coz, o_ozc, o_ocz, oc_ocz, oz_ozc, ozc_ozc, ocz_ocz]
 constraints = [z_zco + z_zoc + zo_zoc + zc_zco + zco_zco + zoc_zoc + c_czo + c_coz + co_coz + cz_czo + czo_czo + coz_coz + o_ozc + o_ocz + oc_ocz + oz_ozc + ozc_ozc + ocz_ocz == 1]
 
+epsilon = 1e-5
+
 def borda_forced_full():
     z = 2 * (z_zco + z_zoc + zo_zoc + zc_zco + zco_zco + zoc_zoc) + 1 * ((c_czo + cz_czo + czo_czo) + (o_ozc + oz_ozc + ozc_ozc))
     c = 2 * (c_czo + c_coz + co_coz + cz_czo + czo_czo + coz_coz) + 1 * ((z_zco + zc_zco + zco_zco) + (o_ocz + oc_ocz + ocz_ocz))
@@ -50,8 +52,8 @@ z_f, c_f, o_f = borda_forced_full()
 constraints += [
     z_p >= c_p,
     z_p >= o_p,
-    c_f >= z_f + 1e-4,  #epsilon to force strictness?
-    c_f >= o_f + 1e-4,
+    c_f >= z_f + epsilon,  #epsilon to force strictness?
+    c_f >= o_f + epsilon,
 ]
 
 prob = cp.Problem(cp.Minimize(0), constraints)
@@ -62,8 +64,8 @@ if prob.status == cp.OPTIMAL:
     print("  Borda winner with partial ballots is z")
     print("  Borda winner with forced full ballots is c")
     for var in P:
-        if var.value > 1e-5:
-            print(f"  {retrieve_name(var)}: {var.value:.4f}")
+        if var.value > epsilon:
+            print(f"  {retrieve_name(var)}: {var.value:.8f}")
 else:
     print("No such distribution found.")
 
