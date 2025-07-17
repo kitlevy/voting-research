@@ -11,7 +11,7 @@ def constraint_majority_prefers_a(alpha_beta):
     alpha, beta_ = alpha_beta
     #incomplete beta function I(alpha, beta, 1/2)
     incomplete_beta = beta.cdf(0.5, alpha, beta_)
-    return 0.5 + epsilon - incomplete_beta  #must be > 0
+    return 0.5 - epsilon - incomplete_beta  #must be > 0
 
 #constraint 2: expected votes for a ≤ expected votes for b
 def expected_votes(alpha, beta_):
@@ -35,23 +35,26 @@ def objective(alpha_beta):
     return 0
 
 def objective_maximize_gap(alpha_beta):
-    alpha, beta_ = alpha_beta
-    va, vb = expected_votes(alpha, beta_)
-    return abs(va - vb)
+    alpha_, beta_ = alpha_beta
+    return -abs(alpha_ - beta_)
 
 epsilon = 1e-5
 
-bounds = [(0.1, 10), (0.1, 10)]
+bounds = [(0.1, 10.0), (0.1, 10.0)]
 constraints = [ #must be dict for scipy optimization
     {'type': 'ineq', 'fun': constraint_majority_prefers_a},
     {'type': 'ineq', 'fun': constraint_expected_votes}
 ]
 initial_guess = [1, 1]  #start w/ uniform beta distribution
-result = minimize(objective, initial_guess, bounds=bounds, constraints=constraints, method='SLSQP', options={'disp': True, 'ftol': 1e-6, 'maxiter': 1000})
+result = minimize(objective_maximize_gap, initial_guess, bounds=bounds, constraints=constraints, method='SLSQP', options={'disp': True, 'maxiter': 1000})
 
 if result.success:
     alpha_opt, beta_opt = result.x
     print(f"Values found: alpha = {alpha_opt:.8f}, beta = {beta_opt:.8f}")
+    votes = expected_votes(alpha_opt, beta_opt)
+    a_share = beta.cdf(0.5, alpha_opt, beta_opt)
+    print(f"Expected votes for a: {votes[0]}, expected votes for b: {votes[1]}")
+    print(f"Share of voters who prefer a: {a_share}")
 else:
     print("No solution found.")
 
