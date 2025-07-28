@@ -8,8 +8,6 @@
 \usepackage{amsthm}
 
 
-
-
 \begin{document}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{2pt plus1pt}
@@ -179,4 +177,18 @@ For $w(u) = \lvert 2u - 1 \rvert$:
     &\implies u_b - u_a < 2u_b - 1 \\
     &\implies u_a + u_b > 1
 \end{align*}
+
+\subsubsection*{Investigating possible $f$:}
+Goal: characterize continuous $f$ where weighting turnout according to a symmetric $w$ can flip the outcome of an election, $\{f: F(\frac{1}{2}) \geq \frac{1}{2}, \int_\frac{1}{2}^1w(x)f(x)dx \geq \int_0^\frac{1}{2}w(x)f(x)dx\}$
+
+Approaching as a convex optimization problem:
+
+$D(f) = \int_\frac{1}{2}^1 w(u)[f(u) - f(1-u)]du$
+
+Feasible space: $S = \{f \in C^0([0,1]): f \geq 0, \int_0^1f = 1, \int_0^\frac{1}{2}f > \frac{1}{2}\}$
+
+Maximize $D(f)$ over $S$ (aka asking question: $\exists f \in S$ s.t. $D(f) > 0$?)
+
+
+
 \end{document}
