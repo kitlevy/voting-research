@@ -1,0 +1,182 @@
+\documentclass[12pt]{article}
+\usepackage[margin=.75in]{geometry}
+
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{bbold}
+\usepackage{enumitem}
+\usepackage{amsthm}
+
+
+
+
+\begin{document}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2pt plus1pt}
+\setlength{\baselineskip}{10pt plus1pt}
+
+\subsection*{Indifference Problem Notes}
+\textbf{Kit Levy}
+
+\subsubsection*{7/15 Post-Meeting Notes:}
+
+\underline{Overview:} Looking at how indifferent voters not showing up to vote affects the expected social welfare of voting rules' selected winning candidate
+\newline
+
+$u =$ distribution of voters, $f(u) =$ density function of distribution $u$, $F(u) =$ CDF, $F(\frac{1}{2}) =$ number of votes for candidate $a$, $u' =$  voters who actually show up to vote
+
+People in $u$ have utilities $u_i = (p_a, p_b)$, show up to vote with prob $u_{\text{choice \#}1} - u_{\text{choice \#}2}$ aka strength of preference between the two candidates (eventually maybe $\operatorname{entropy}(u)$)
+
+Probability a person will vote: $u_1 - u_2 = \begin{cases} 
+u_1 - (1-u_1) & \text{if } u \geq \frac{1}{2} \\
+(1 - u_1) - u_1 & \text{if } u \geq \frac{1}{2}\\
+\end{cases} = \begin{cases} 
+2u_1 - 1 & \text{if } u \geq \frac{1}{2} \\
+1 - 2u_1 & \text{if } u \geq \frac{1}{2}\\
+\end{cases}$
+\newline \newline
+
+\underline{Problem:} Investigating "distortion" $ = \frac{\mathbb{E}[sw(f(u), u)]}{\mathbb{E}[sw(f(u'), u)]}$ for different voting rules
+
+$sw(f(u'), u) =$ total social welfare (from all of $u$) in an election where only $u'$ vote
+
+Distortion $\geq 1 \rightarrow$ people not showing up harmed soc. welfare, distortion $< 1 \rightarrow$ people not showing up improved outcome's sw, find examples?
+
+Eventually try to find bounds on distortion for different voting rules
+\newline
+
+\underline{Starting subproblem:} imagine $u$ as drawn from a Beta distribution $u_i \sim \operatorname{Beta}(\alpha, \beta)$ (because can extend to more dimensions with $\operatorname{Dirichlet}(\vec{\delta})$, doesn't necessarily have to be)
+
+Find $\alpha, \beta$ such that $\begin{cases}
+F(\frac{1}{2}) \geq \frac{1}{2} & \text{(aka more people in $u$ prefer $a$ over $b$)} \\
+\mathop{\mathbb{E}}_{u'}[f(u')] = \text{ B} & \text{(expected winner if only $u'$ vote is B)}
+\end{cases}$
+
+$\mathop{\mathbb{E}}_{u'}[f(u')] = b$ equiv to $\int_0^{\frac{1}{2}} (1 - 2u) f(u) du \leq \int_{\frac{1}{2}}^1 (2u - 1)f(u)du$ (ex. votes for A $\leq$ ex. votes for B)
+
+$(1 - 2u) =$ probability you vote if located at $u$, $f(u) =$ prob a person's prefs are located at $u$, $\int_0^{\frac{1}{2}} (1 - 2u) f(u) du =$ expected people who will vote (i.e. are in $u'$) and who prefer A
+\newline
+
+Constraints:
+\begin{enumerate}[nolistsep]
+    \setlength{\itemsep}{0pt}
+    \setlength{\parskip}{0pt}
+    \item $\frac{1}{B(\alpha, \beta)}\frac{\int_0^{\frac{1}{2}} t^{\alpha-1}(1-t)^{\beta-1}dt}{\int_0^1 t^{\alpha-1}(1-t)^{\beta-1}dt} \leq \frac{1}{2}$
+    \item $\int_0^\frac{1}{2}(1-2u)(u^{\alpha-1}(1-u)^{\beta-1})du \leq \int_\frac{1}{2}^1(2u-1)(u^{\alpha-1}(1-u)^{\beta-1})du$
+\end{enumerate}
+
+\subsubsection*{To-Do List (starting 7/16):}
+\begin{enumerate}
+    \item Find subproblem's example of $\alpha, \beta$ for various voting rules
+    \begin{enumerate}
+        \item Investigate whether to do it analytically or with numerical integration
+        \item Try for plurality voting, then IRV, Borda, etc.
+        \item Write up examples
+    \end{enumerate}
+    \item Analyze distortion for examples
+    \item Investigate bounds for examples
+    \item Find examples where distortion $<1$
+\end{enumerate}
+
+
+\subsubsection*{No distribution $u \sim \operatorname{Beta}(\alpha, \beta)$ exists such that A strictly wins with full turnout and B strictly wins with turnout weighted according to $\lvert 2u - 1 \rvert$:}
+
+\begin{proof}
+    \setlength{\baselineskip}{12pt}
+    \setlength{\lineskip}{3.5pt}
+    \setlength{\lineskiplimit}{2pt}
+    Let $f(u) = \frac{1}{B(\alpha, \beta)}u^{\alpha-1}(1-u)^{\beta-1}, u \in [0, 1]$. Let $F(x) = \int_0^x f(u) du$. A wins under full turnout and B wins with weighted turnout $\iff$
+\begin{description}[nolistsep]
+    \item[\normalfont Constraint 1:] $F(\frac{1}{2}) < \frac{1}{2}$ and
+    \item[\normalfont Constraint 2:] $\int_0^\frac{1}{2}(1-2u)f(u)du < \int_\frac{1}{2}^1(2u-1)f(u)du$
+\end{description}
+\textbf{Fulfilling Constraint 1:} \\
+$F(\frac{1}{2}) < \frac{1}{2}$ \\
+$\implies \int_0^{\frac{1}{2}} f(u) du > \frac{1}{2}$ \\ 
+$\implies \alpha < \beta$. \\
+\textbf{Fulfilling Constraint 2:} \\
+$\int_0^\frac{1}{2}(1-2u)f(u)du < \int_\frac{1}{2}^1(2u-1)f(u)du$ \\
+$ \implies - \int_0^\frac{1}{2}(2u-1)f(u)du < \int_\frac{1}{2}^1(2u-1)f(u)du$ \\
+$ \implies 0 < \int_\frac{1}{2}^1(2u-1)f(u)du + \int_0^\frac{1}{2}(2u-1)f(u)du$ \\
+$\implies \int_0^1(2u-1)f(u)du > 0$ \\
+$\implies 2\int_0^1 uf(u)du - \int_0^1f(u)du > 0$ \\
+Because $f(u)$ is a probability density, we know $\int_0^1f(u)du = 1$  and $\int_0^1uf(u)du = \mathbb{E}[u]$. \\
+Thus, $2\int_0^1 uf(u)du - \int_0^1f(u)du > 0 \implies 2\mathbb{E}[u] - 1 > 0 \implies \mathbb{E}[u] > \frac{1}{2}$ \\
+For $u \sim \operatorname{Beta}(\alpha, \beta)$, $\mathbb{E}[u] = \frac{\alpha}{\alpha + \beta}$. \\
+Thus, $\mathbb{E}[u] > \frac{1}{2} \implies \frac{\alpha}{\alpha + \beta} > \frac{1}{2}$ \\
+$\implies \alpha > \beta$. \\
+Because Constraint 1$\iff \alpha < \beta$ and Constraint 2$\iff \alpha > \beta$, there is no distribution $u \sim \operatorname{Beta}(\alpha, \beta)$ that fulfills both constraints. \\
+It follows that there is no distribution $u \sim \operatorname{Beta}(\alpha, \beta)$ that fulfills both constraints for any distribution of votes proportional to $\lvert 2u - 1 \rvert$.
+\end{proof}
+
+\subsubsection*{No distribution $u \sim \operatorname{Beta}(\alpha, \beta)$ exists such that A strictly wins with full turnout and B strictly wins with turnout weighted according to any function $w$ such that $w(u)$ is symmetric around $u = \frac{1}{2}$:}
+\begin{proof}
+    \setlength{\baselineskip}{12pt}
+    \setlength{\lineskip}{3.5pt}
+    \setlength{\lineskiplimit}{2pt}
+    Let $w(u)$ be symmetric around $u = \frac{1}{2}$. \\
+    Then, $\int_0^1w(u)f(u)du = \int_0^1w(1 - u)f(u)du$ \\
+    For $u \sim \operatorname{Beta}(\alpha, \beta)$ we have:
+    \begin{itemize}[nolistsep]
+        \item $f(u) > f(1 - u)$ on $u \in [0, \frac{1}{2}) \iff \alpha < \beta$
+        \item $f(u) = f(1 - u) \iff \alpha = \beta$
+        \item $f(u) < f(1 - u)$ on $u \in [0, \frac{1}{2}) \iff \alpha > \beta$
+    \end{itemize}
+    So if $f(u)$ has more mass on the left (i.e. $a$ wins the unweighted vote with full turnout, i.e. $F(\frac{1}{2}) > \frac{1}{2}$, i.e. $ \alpha < \beta$), and $w(u)$ is symmetric, then: \\
+    We know $w(u) \geq 0$, and $f(u) > f(1 - u)$ on $u \in [0, \frac{1}{2}$, so $w(u)f(u) > w(u)f(1 - u)$ \\
+    $\implies \int_0^{\frac{1}{2}}w(u)f(u)du > \int_0^{\frac{1}{2}}w(u)f(1 - u)du$ \\
+    Let $t = 1 - u$ (while $u \in [0, \frac{1}{2}]$). $\int_0^{\frac{1}{2}}w(u)f(1 - u)du = \int_1^{\frac{1}{2}}w(1 - t)f(t)(-dt) = \int^1_{\frac{1}{2}}w(t)f(t)dt$ \\
+    $\implies \int_0^{\frac{1}{2}}w(u)f(u)du > \int^1_{\frac{1}{2}}w(t)f(t)dt$ \\
+    $\implies \int_0^{\frac{1}{2}}w(u)f(u)du > \int^1_{\frac{1}{2}}w(u)f(u)du$ \\
+    $\implies$ weighted votes for a $>$ weighted votes for b. \\
+    Thus, for votes distributed according to $u \sim \operatorname{Beta}(\alpha, \beta)$, a wins the unweighted election $\implies$ a wins any election weighted according to a function $w$ such that $w(u)$ is symmetric around $u = \frac{1}{2}$.
+\end{proof}
+
+\subsubsection*{7/23 Post-Meeting Notes}
+
+Distortion = $\frac{sw(a^*, u)}{\mathbb{E}[sw(f(P'), u)]}$, $a^* =$ optimal welfare alternative, $P =$ fixed preference profile, $P' \subseteq P =$ after dropout according to $w(u)$
+
+\underline{Next goals}:
+\begin{enumerate}[nolistsep]
+    \item Axiomatize/parametrize $w$
+    \begin{itemize}[nolistsep]
+        \item $w$ should be symmetric around $u = \frac{1}{2}$, need $w(x) = w(\sigma(x))$ (permutation of $x$)
+        \item Look at goals of voting, give characteristics of $w$ maybe
+        \item Conj: if $w$ is symmetric and single-peaked at $\frac{1}{2}$ then $\mathbb{E}[sw(f(P'), u)] \geq \mathbb{E}[sw(f(P), u)]$
+    \end{itemize}
+    \item Two "types of voters"/model with two lines of different proportions
+    \begin{itemize}[nolistsep]
+        \item $v_a : u_a$ and $v_b : u_b$ (two utility locations), $Pr[v_a] = p_a$ and $Pr[v_b] = p_b$ (two proportions of each group)
+        \item Find restrictions on $u_a, u_b, p_a$ (lin eq) where $F(\frac{1}{2}) \geq \frac{1}{2}$ and $\int_\frac{1}{2}^1w(x)f(x)dx \geq \int_0^\frac{1}{2}w(x)f(x)dx$
+        \item Fix $w(x) = (2x-1)^2 \rightarrow$ parametrize as $(cx-\frac{c}{2})^2$ (different steepnesses of curve)
+    \end{itemize}
+    \item Characterize continuous (Lipschitz) distributions $f$ where for symmetric $w$ weighted turnout can flip outcome
+    \begin{itemize}[nolistsep]
+        \item $\{f: F(\frac{1}{2}) \geq \frac{1}{2}, \int_\frac{1}{2}^1w(x)f(x)dx \geq \int_0^\frac{1}{2}w(x)f(x)dx\}$
+        \item $\iff \int_\frac{1}{2}^1w(x)[f(x)-f(1-x)]dx \geq 0$, parametrize somehow?
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection*{Two groups model:}
+Majority prefers a and b wins election with turnout $\iff$
+\begin{equation*}
+  \left\{\begin{array}{@{}l@{}}
+    p_a > 1 - p_a \\
+    w(u_b)(1 - p_a) > w(u_a)p_a \\
+  \end{array}\right.\
+\end{equation*}
+\begin{align*}
+    &w(u_b)(1 - p_a) > w(u_a)p_a \\
+    &\implies w(u_b) - p_a(w(u_b) + w(u_a)) > 0 \\
+    &\implies \frac{1}{2} < p_a < \frac{w(u_b)}{w(u_b) + w(u_a)}
+\end{align*}
+For $w(u) = \lvert 2u - 1 \rvert$:
+\begin{align*}
+    &p_a < \frac{w(u_b)}{w(u_b) + w(u_a)} \\
+    &\implies p_a < \frac{2u_b - 1}{2u_b - 1 + 1 - 2u_a} \\
+    &\implies p_a < \frac{2u_b - 1}{2u_b - 2u_a} \\
+    &\implies \frac{1}{2} < \frac{2u_b - 1}{2u_b - 2u_a} \\
+    &\implies u_b - u_a < 2u_b - 1 \\
+    &\implies u_a + u_b > 1
+\end{align*}
+\end{document}
