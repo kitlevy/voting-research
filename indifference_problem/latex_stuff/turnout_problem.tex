@@ -181,7 +181,7 @@ For $w(u) = \lvert 2u - 1 \rvert$:
 \subsubsection*{Investigating possible $f$:}
 Goal: characterize continuous $f$ where weighting turnout according to a symmetric $w$ can flip the outcome of an election, $\{f: F(\frac{1}{2}) \geq \frac{1}{2}, \int_\frac{1}{2}^1w(x)f(x)dx \geq \int_0^\frac{1}{2}w(x)f(x)dx\}$
 
-Approaching as a convex optimization problem:
+\underline{Approaching as a convex optimization problem}:
 
 $D(f) = \int_\frac{1}{2}^1 w(u)[f(u) - f(1-u)]du$
 
@@ -189,6 +189,34 @@ Feasible space: $S = \{f \in C^0([0,1]): f \geq 0, \int_0^1f = 1, \int_0^\frac{1
 
 Maximize $D(f)$ over $S$ (aka asking question: $\exists f \in S$ s.t. $D(f) > 0$?)
 
+(see Python script, not sure how to interpret)
+\newline
+
+\underline{Trying to linearize everything with nudge function}:
+
+$f(u) = f_0(u) + \epsilon g(u)$ where $f_0(u) = 1$ (uniform density for baseline), $\int_0^1 g(u) du = 0$, $\epsilon < < 1$ controls deviation (still fulfills pdf requirements)
+
+Full turnout condition:
+
+$\int_0^\frac{1}{2} f(u)du = \int_0^\frac{1}{2} (1 + \epsilon g(u)) du = \frac{1}{2} + \epsilon \int_0^\frac{1}{2}g(u)du$
+
+$\implies$ A wins under full turnout $\iff \epsilon \int_0^\frac{1}{2}g(u)du > 0$
+
+Weighted turnout condition:
+
+$\int_\frac{1}{2}^1w(u)f(u)du - \int_0^\frac{1}{2}w(u)f(u)du = \int_0^1w(u)f(u)\operatorname{sgn}(u - \frac{1}{2})du$
+
+$\int_0^1w(u)(1 + \epsilon g(u))\operatorname{sgn}(u - \frac{1}{2})du = \int_0^1w(u)\operatorname{sgn}(u - \frac{1}{2})du + \epsilon \int_0^1w(u)g(u)\operatorname{sgn}(u - \frac{1}{2})du$
+
+$\int_0^1w(u)\operatorname{sgn}(u - \frac{1}{2})du = 0$ because $\operatorname{sgn}(u - \frac{1}{2})$ flips from $-1$ to $1$ and $w$ is symmetric, so the two halves should cancel out.
+
+$\implies$ B wins with weighted turnout $\iff \epsilon\int_0^1w(u)g(u)\operatorname{sgn}(u - \frac{1}{2})du > 0$
+
+A wins under full turnout and B wins with weighted turnout $\iff$
+\begin{description}[nolistsep]
+    \item[\normalfont Constraint 1:] $\epsilon \int_0^\frac{1}{2}g(u)du > 0$ and
+    \item[\normalfont Constraint 2:] $\epsilon\int_0^1w(u)g(u)\operatorname{sgn}(u - \frac{1}{2})du > 0$
+\end{description}
 
 
 \end{document}
