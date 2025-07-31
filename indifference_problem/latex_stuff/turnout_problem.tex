@@ -16,7 +16,7 @@
 \subsection*{Indifference Problem Notes}
 \textbf{Kit Levy}
 
-\subsubsection*{7/15 Post-Meeting Notes:}
+\subsection*{7/15 Post-Meeting Notes:}
 
 \underline{Overview:} Looking at how indifferent voters not showing up to vote affects the expected social welfare of voting rules' selected winning candidate
 \newline
@@ -130,7 +130,7 @@ It follows that there is no distribution $u \sim \operatorname{Beta}(\alpha, \be
     Thus, for votes distributed according to $u \sim \operatorname{Beta}(\alpha, \beta)$, a wins the unweighted election $\implies$ a wins any election weighted according to a function $w$ such that $w(u)$ is symmetric around $u = \frac{1}{2}$.
 \end{proof}
 
-\subsubsection*{7/23 Post-Meeting Notes}
+\subsection*{7/23 Post-Meeting Notes}
 
 Distortion = $\frac{sw(a^*, u)}{\mathbb{E}[sw(f(P'), u)]}$, $a^* =$ optimal welfare alternative, $P =$ fixed preference profile, $P' \subseteq P =$ after dropout according to $w(u)$
 
@@ -217,6 +217,39 @@ A wins under full turnout and B wins with weighted turnout $\iff$
     \item[\normalfont Constraint 1:] $\epsilon \int_0^\frac{1}{2}g(u)du > 0$ and
     \item[\normalfont Constraint 2:] $\epsilon\int_0^1w(u)g(u)\operatorname{sgn}(u - \frac{1}{2})du > 0$
 \end{description}
+
+
+\subsection*{7/29 Post-Meeting Notes}
+
+\underline{To-Do}:
+
+\begin{itemize}[nolistsep]
+    \item Conjecture: FOSD of $G_B$ vs. $G_A$ is sufficient to enable swap
+        \begin{itemize}[nolistsep]
+            \item $g_A: [0, \frac{1}{2}] = f(x), g_B: [0, \frac{1}{2}] = f(1 - x)$ gives strength of prefs, $[0, \frac{1}{2}]$ maps strong to weak preferences 
+            \item First order stochastic dominance: point-for-point $G_B \geq G_A$
+            \item Sufficient that flip over symmetric $w$ can occur with $u \sim f$
+        \end{itemize}
+    \item Explore whether FOSD is necessary
+    \item Try to write "closest case" of $f$ as function of $w$
+        \begin{itemize}[nolistsep]
+            \item Closest case minimizes votes for B - votes for A
+            \item Look at Python script for examples, $w$ closest case looks quadratic when $w$ is quadratic, etc.
+        \end{itemize}
+    \item Claim: can characterize $\operatorname{dist}(V, w)$ for majority on two outcomes not achieving optimal
+        \begin{itemize}[nolistsep]
+            \item Comes from characterizing $f$ from $w$?
+            \item $V$ is voting rule, $P$ is total population, $P'$ is weighted voters
+        \end{itemize}
+\end{itemize}
+
+\subsubsection*{Conjecture: FOSD of $G_B$ vs. $G_A$ is sufficient to enable swap}
+
+Let $A, B$ be two random variables. $A$ has first-order stochastic dominance over $B$ 
+\begin{align*}
+    &\iff \forall\text{ outcomes } x, Pr[A \geq x] \geq Pr[B \geq x]\text{ and }\exists x\text{ such that } Pr[A \geq x] > Pr[B \geq x] \\
+    &\iff \forall x\text{ }F_A(x) \leq F_B(x)\text{ and }\exists x\text{ such that } F_A(x) < F_B(x)\text{, where }F_A, F_B\text{ are the CDFs of }A, B.
+\end{align*}
 
 
 \end{document}
