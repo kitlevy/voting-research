@@ -1,12 +1,13 @@
 \documentclass[12pt]{article}
 \usepackage[margin=.75in]{geometry}
 
+\usepackage{macros}
 \usepackage{amsfonts}
-\usepackage{amsmath}
+%\usepackage{amsmath}
 \usepackage{bbold}
 \usepackage{enumitem}
-\usepackage{amsthm}
-
+%\usepackage{amsthm}
+%\newtheorem{definition}{Definition}
 
 \begin{document}
 \setlength{\parindent}{0pt}
@@ -17,6 +18,8 @@
 \textbf{Kit Levy}
 
 \subsection*{7/15 Post-Meeting Notes:}
+\jessie{Just FYI I have macros for us}
+\kit{test}
 
 \underline{Overview:} Looking at how indifferent voters not showing up to vote affects the expected social welfare of voting rules' selected winning candidate
 \newline
@@ -34,7 +37,7 @@ u_1 - (1-u_1) & \text{if } u \geq \frac{1}{2} \\
 \end{cases}$
 \newline \newline
 
-\underline{Problem:} Investigating "distortion" $ = \frac{\mathbb{E}[sw(f(u), u)]}{\mathbb{E}[sw(f(u'), u)]}$ for different voting rules
+\underline{Problem:} Investigating ``distortion'' $ = \frac{\mathbb{E}[sw(f(u), u)]}{\mathbb{E}[sw(f(u'), u)]}$ for different voting rules
 
 $sw(f(u'), u) =$ total social welfare (from all of $u$) in an election where only $u'$ vote
 
@@ -130,7 +133,7 @@ It follows that there is no distribution $u \sim \operatorname{Beta}(\alpha, \be
     Thus, for votes distributed according to $u \sim \operatorname{Beta}(\alpha, \beta)$, a wins the unweighted election $\implies$ a wins any election weighted according to a function $w$ such that $w(u)$ is symmetric around $u = \frac{1}{2}$.
 \end{proof}
 
-\subsection*{7/23 Post-Meeting Notes}
+\subsection*{7/23 Post-Meeting Notes:}
 
 Distortion = $\frac{sw(a^*, u)}{\mathbb{E}[sw(f(P'), u)]}$, $a^* =$ optimal welfare alternative, $P =$ fixed preference profile, $P' \subseteq P =$ after dropout according to $w(u)$
 
@@ -219,7 +222,7 @@ A wins under full turnout and B wins with weighted turnout $\iff$
 \end{description}
 
 
-\subsection*{7/29 Post-Meeting Notes}
+\subsection*{7/29 Post-Meeting Notes:}
 
 \underline{To-Do}:
 
@@ -245,11 +248,43 @@ A wins under full turnout and B wins with weighted turnout $\iff$
 
 \subsubsection*{Conjecture: FOSD of $G_B$ vs. $G_A$ is sufficient to enable swap}
 
-Let $A, B$ be two random variables. $A$ has first-order stochastic dominance over $B$ 
+\begin{definition}
+Let $g, h$ be two probability densities on $\mathbb{R}$ such that $\mathbb{E}_{X \sim g}[\lvert X \rvert], \mathbb{E}_{X \sim h}[\lvert X \rvert]$ are both finite. $g$ has first-order stochastic dominance over $h$ 
 \begin{align*}
-    &\iff \forall\text{ outcomes } x, Pr[A \geq x] \geq Pr[B \geq x]\text{ and }\exists x\text{ such that } Pr[A \geq x] > Pr[B \geq x] \\
-    &\iff \forall x\text{ }F_A(x) \leq F_B(x)\text{ and }\exists x\text{ such that } F_A(x) < F_B(x)\text{, where }F_A, F_B\text{ are the CDFs of }A, B.
+    &\iff \forall u: \mathbb{R} \to \mathbb{R}\text{ that is non-decreasing, }\mathbb{E}_{X \sim g}[a(X)] \geq \mathbb{E}_{X \sim h}[u(X)] \\
+    &\iff \forall t \in \mathbb{R}, G(t) \leq H(t) \\
+    &\iff \exists\text{ two random variables }X \sim g, Y \sim h\text{ such that }X = Y + \delta\text{ where }\delta \geq 0
 \end{align*}
+\end{definition}
+
+    Let $f(x): [0,1]$ be some probability density from which voters' preferences are drawn, with $F(x): [0,1]$ as its cumulative distribution function. Let $g_A: [0, \frac{1}{2}] = f(x), g_B: [0, \frac{1}{2}] = f(1 - x)$. Then, let $G_A = \int_0^xg_A(x)dx =  \int_0^xf(x)dx = F(x)$, and $G_B = \int_0^xg_B(x)dx = \int_0^xf(1 - x)dx = -\int_1^{1-x}f(x)dx = \int_{1-x}^1f(x)dx = F(1) - F(1-x)$.
+         
+   \jessie{Notes/outline here, hoping to maybe correct something that's been misstated on my end (which is very likely)}
+\begin{proof}
+Observe that the expected number of votes candidate $a$ receives is $\int_0^{\frac 1 2} w(x) f(x) dx$, and the expected number of votes candidate $b$ receives is 
+\begin{align*}
+v_B &= \int_{\frac 1 2}^1 w(x) f(x) dx\\
+&= \int_{0}^{\frac 1 2} w(1-x) f(1-x) dx \qquad \text{reparameterizing the integral} \\
+&= \int_{0}^{\frac 1 2} w(x) f(1-x) dx \qquad \text{symmetry of $w$: $w(x) = w(1-x)$.} \\
+&\overset{?}{>} v_A = \int_{0}^{\frac 1 2} w(x) f(x) dx \\
+&\overset{?}{\implies} \int_{0}^{\frac 1 2} f(1-x) dx > \int_{0}^{\frac 1 2} f(x) dx \qquad \text{Monotonicity of $w$ \jessie{FALSE; $w$ affine is sufficient for the statement to hold though}}
+\end{align*}
+\end{proof}
+
+\subsection*{8/8 Post-Meeting Notes:}
+
+\begin{itemize}[nolistsep]
+    \item Set $f$ to be class of linear functions as in Python script
+    \item $G_A$ must cross $G_B$ at point $c$
+    \item Hypothesis: flip happens if $w$ concave, decreasing, $w''(c)=0$
+        \begin{itemize}[nolistsep]
+            \item Look at integration by parts of $\int f(u) w(u) du$
+            \item (Only for linear $f$?)
+        \end{itemize}
+\end{itemize}
+
+
 
 
 \end{document}
+

@@ -6,12 +6,16 @@ u = np.linspace(0, 1, N)
 du = u[1] - u[0]
 epsilon = 1e-3
 
-
-w = 0.5 * np.abs(2 * u - 1) + .5
-#w = (u - 1/2) ** 2
+#w = np.abs(2 * u - 1)
+#w = 0.5 * np.abs(2 * u - 1) + .5
+w = (u - 1/2) ** 2
 #c = 2
 #w = (c * u - c / 2) ** 2
 
+#w_string = "|2u - 1|"
+#w_string = "1/2 * |2u - 1| + 1/2"
+w_string = "(u - 1/2)^2"
+#w_string = "cu - c/2, c = {}".format(c)
 
 #general f:
 
@@ -33,7 +37,7 @@ L = 1500  #max derivative
 for i in range(N - 1):
     constraints.append(cp.abs(f[i + 1] - f[i]) <= L * du)
 
-#default problem
+#"closest case" problem
 prob = cp.Problem(cp.Minimize(weighted_B - weighted_A), constraints)
 
 #random directions for variation
@@ -82,9 +86,10 @@ prob.solve(solver=cp.SCS)
 if f.value is not None:
     import matplotlib.pyplot as plt
     plt.plot(u, f.value, label="f")
-    plt.plot(u, w, label="w")
-    plt.plot(u, w * f.value, label="f * w")
-    plt.title("Voter distribution f(u)")
+    #plt.plot(u, w, label="w")
+    #plt.plot(u, w * f.value, label="f * w")
+    plt.suptitle("Voter distribution f(u)")
+    plt.title("w = " + w_string)
     plt.xlabel("u")
     plt.ylabel("Density")
     plt.grid(True)
